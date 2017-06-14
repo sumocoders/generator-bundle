@@ -1,2 +1,9 @@
 services:
+  sumo_coders_generator.command.generator_command:
+    class: SumoCoders\GeneratorBundle\Command\GeneratorCommand
+    arguments: ['@sumo_coders_generator.generator.writer']
+    tags:
+      - { name: console.command }
 
+  sumo_coders_generator.generator.writer:
+    class: SumoCoders\GeneratorBundle\Generator\FileWriter

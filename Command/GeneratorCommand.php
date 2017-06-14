@@ -3,7 +3,10 @@
 namespace SumoCoders\GeneratorBundle\Command;
 
 use InvalidArgumentException;
+use ReflectionClass;
+use SumoCoders\GeneratorBundle\Generator\CommandGenerator;
 use SumoCoders\GeneratorBundle\Generator\DataTransferObjectGenerator;
+use SumoCoders\GeneratorBundle\Generator\FileWriter;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,6 +14,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GeneratorCommand extends ContainerAwareCommand
 {
+    /**
+     * @var FileWriter
+     */
+    private $fileWriter;
+
+    /**
+     * @param FileWriter $writer
+     */
+    public function __construct(FileWriter $writer)
+    {
+        parent::__construct();
+        $this->fileWriter = $writer;
+    }
+
     protected function configure()
     {
         $this->setName('sumocoders:generate');
@@ -28,8 +45,32 @@ class GeneratorCommand extends ContainerAwareCommand
 
         $bundle = $this->getContainer()->get('kernel')->getBundle($bundleName);
 
-        $generator = new DataTransferObjectGenerator();
-        $generator->generate($bundle, $entity);
+        $entityReflection = new ReflectionClass($bundle->getNamespace() . '\\' . $entity);
+
+        $dataTransferObjectGenerator = new DataTransferObjectGenerator();
+        $dataTransferObject = $dataTransferObjectGenerator->generate($bundle, $entityReflection);
+
+        $this->fileWriter->saveFileContent($bundle, $dataTransferObject, 'DataTransferObject');
+
+        $commandGenerator = new CommandGenerator();
+
+        $createCommand = $commandGenerator->generate(
+            CommandGenerator::CREATE_COMMAND, $bundle, $entityReflection, $dataTransferObject
+        );
+
+        $this->fileWriter->saveFileContent($bundle, $createCommand, 'Command');
+
+        $updateCommand = $commandGenerator->generate(
+            CommandGenerator::UPDATE_COMMAND, $bundle, $entityReflection, $dataTransferObject
+        );
+
+        $this->fileWriter->saveFileContent($bundle, $updateCommand, 'Command');
+
+        $deleteCommand = $commandGenerator->generate(
+            CommandGenerator::DELETE_COMMAND, $bundle, $entityReflection, $dataTransferObject
+        );
+
+        $this->fileWriter->saveFileContent($bundle, $deleteCommand, 'Command');
     }
 
     /**
