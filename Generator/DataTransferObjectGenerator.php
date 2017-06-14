@@ -2,7 +2,6 @@
 
 namespace SumoCoders\GeneratorBundle\Generator;
 
-use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpProperty;
@@ -16,30 +15,20 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 final class DataTransferObjectGenerator extends Generator
 {
     /**
-     * @var DefaultGeneratorStrategy
-     */
-    private $strategy;
-
-    public function __construct()
-    {
-        $this->strategy = new DefaultGeneratorStrategy();
-    }
-
-    /**
      * @param BundleInterface $bundle
-     * @param string $entity
+     * @param ReflectionClass $entityReflection
+     *
+     * @return PhpClass
      */
-    public function generate($bundle, $entity)
+    public function generate(BundleInterface $bundle, $entityReflection)
     {
-        $reflect = new ReflectionClass($bundle->getNamespace() . '\\' . $entity);
-
-        $properties = $this->getProperties($reflect);
+        $properties = $this->getProperties($entityReflection);
 
         $class = new PhpClass();
         $class->setName(
             $this->createClassName(
                 $bundle,
-                $reflect->getShortName() . 'DataTransferObject',
+                $entityReflection->getShortName() . 'DataTransferObject',
                 'DataTransferObject'
             )
         );
@@ -59,10 +48,7 @@ final class DataTransferObjectGenerator extends Generator
         $class->addUseStatement(Collection::class);
         $class->addUseStatement(ArrayCollection::class);
 
-        $this->saveFileContent(
-            $this->createFileName($bundle, $reflect->getShortName() . 'DataTransferObject', 'DataTransferObject'),
-            $this->strategy->generate($class)
-        );
+        return $class;
     }
 
     /**
@@ -104,18 +90,6 @@ final class DataTransferObjectGenerator extends Generator
     }
 
     /**
-     * @param BundleInterface $bundle
-     * @param string $className
-     * @param string $root
-     *
-     * @return string
-     */
-    private function createClassName(BundleInterface $bundle, $className, $root)
-    {
-        return $bundle->getNamespace() . '\\' . $root . '\\' . $className;
-    }
-
-    /**
      * @param $properties array
      *
      * @return PhpMethod
@@ -134,24 +108,5 @@ final class DataTransferObjectGenerator extends Generator
         $method->setBody($writer->getContent());
 
         return $method;
-    }
-
-    /**
-     * @param BundleInterface $bundle
-     * @param string $class
-     * @param string $root
-     *
-     * @return string
-     */
-    private function createFileName(BundleInterface $bundle, $class, $root)
-    {
-        return implode(
-            DIRECTORY_SEPARATOR,
-            [
-                $bundle->getPath(),
-                $root,
-                str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php',
-            ]
-        );
     }
 }

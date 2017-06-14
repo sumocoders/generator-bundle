@@ -2,20 +2,19 @@
 
 namespace SumoCoders\GeneratorBundle\Generator;
 
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+
 class Generator
 {
     /**
-     * @param string $filename
-     * @param string $content
+     * @param BundleInterface $bundle
+     * @param string $className
+     * @param string $root
      *
-     * @return mixed
+     * @return string
      */
-    public function saveFileContent($filename, $content)
+    protected function createClassName(BundleInterface $bundle, $className, $root)
     {
-        if (!is_dir(dirname($filename))) {
-            @mkdir(dirname($filename), 0775, true);
-        }
-
-        return @file_put_contents($filename, sprintf("<?php\n\n%s", $content));
+        return $bundle->getNamespace() . '\\' . $root . '\\' . $className;
     }
 }
