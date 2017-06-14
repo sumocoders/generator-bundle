@@ -13,7 +13,7 @@ This bundle is under the MIT license. See the complete license at: [LICENSE](LIC
 
 # Usage 
 
-...
+`app/console sumocoders:generate --entity AppBundle:Entity/Post`
 
 # Issues
 
