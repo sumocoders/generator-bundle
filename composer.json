@@ -1,0 +1,12 @@
+{
+    "name": "sumocoders/generator-bundle",
+    "description": "Generator",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bruno Vitorino",
+            "email": "bruno@sumocoders.be"
+        }
+    ]
+}
