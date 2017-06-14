@@ -13,7 +13,7 @@ class GeneratorCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
-        $this->setName('sumo:generate');
+        $this->setName('sumocoders:generate');
         $this->addOption(
             'entity',
             '-en',
