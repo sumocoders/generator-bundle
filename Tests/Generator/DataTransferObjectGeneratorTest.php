@@ -3,41 +3,13 @@
 namespace SumoCoders\GeneratorBundle\Tests\Generator;
 
 use PHPUnit_Framework_TestCase;
+use ReflectionClass;
+use ReflectionProperty;
 use SumoCoders\GeneratorBundle\Generator\DataTransferObjectGenerator;
 use SumoCoders\GeneratorBundle\SumoCodersGeneratorBundle;
 
 class DataTransferObjectGeneratorTest extends PHPUnit_Framework_TestCase
 {
-    const CLASS_NAME = 'EntityClass.php';
-
-    /**
-     * @var string
-     */
-    private $directory;
-
-    /**
-     * @var string
-     */
-    private $filePath;
-
-    protected function setUp()
-    {
-        $this->directory = getcwd() . DIRECTORY_SEPARATOR . '..' .
-            DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Entity' . DIRECTORY_SEPARATOR;
-
-        @mkdir($this->directory);
-
-        $this->filePath = $this->directory . self::CLASS_NAME;
-
-        file_put_contents($this->filePath, $this->getClassContent());
-    }
-
-    protected function tearDown()
-    {
-        unlink($this->filePath);
-        rmdir($this->directory);
-    }
-
     public function testDataTransferObjectGenerator()
     {
         $generator = new DataTransferObjectGenerator();
@@ -49,37 +21,42 @@ class DataTransferObjectGeneratorTest extends PHPUnit_Framework_TestCase
             ->method('getNamespace')
             ->will($this->returnValue('SumoCoders\GeneratorBundle'));
 
-        $generator->generate($bundle, 'Entity\EntityClass');
-    }
+        $propertyId = $this->getMockBuilder(ReflectionProperty::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    /**
-     * @return string
-     */
-    private function getClassContent()
-    {
-        return <<<EOF
-<?php
+        $propertyId->expects($this->atLeastOnce())
+            ->method('getDocComment')
+            ->will($this->returnValue("/**\n * @var int\n **/"));
+        $propertyId->expects($this->atLeastOnce())
+            ->method('getName')
+            ->will($this->returnValue('id'));
 
-namespace SumoCoders\GeneratorBundle\Entity;
+        $propertyName = $this->getMockBuilder(ReflectionProperty::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $propertyName->expects($this->atLeastOnce())
+            ->method('getDocComment')
+            ->will($this->returnValue("/**\n * @var string\n **/"));
+        $propertyName->expects($this->atLeastOnce())
+            ->method('getName')
+            ->will($this->returnValue('name'));
 
-use Doctrine\Common\Collections\Collection;
+        $entityReflection = $this->getMockBuilder(ReflectionClass::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityReflection->expects($this->atLeastOnce())
+            ->method('getShortName')
+            ->will($this->returnValue('Blog'));
+        $entityReflection->expects($this->atLeastOnce())
+            ->method('getProperties')
+            ->willReturn([
+                $propertyId, $propertyName,
+            ]);
 
-class EntityClass {
-    /**
-     * @var int
-     */
-    private \$id;
-    
-    /**
-     * @var string
-     */
-    private \$name;
-    
-    /**
-     * @var Collection
-     */
-    private \$collection;
-}
-EOF;
+        $dataTransferObjectClass = $generator->generate($bundle, $entityReflection);
+
+        $this->assertNotNull($dataTransferObjectClass);
+        $this->assertCount(2, $dataTransferObjectClass->getProperties());
     }
 }
