@@ -64,8 +64,12 @@ final class DataTransferObjectGenerator extends Generator
 
         foreach ($reflectionProperties as $reflectionProperty) {
             $var = [];
-            preg_match('/.*\@var\s(\w+)/', $reflectionProperty->getDocComment(), $var);
 
+            // Ignore @GeneratedValue properties
+            if (preg_match('/\@ORM\\\\GeneratedValue/', $reflectionProperty->getDocComment())) {
+                continue;
+            }
+            preg_match('/.*\@var\s(\w+)/', $reflectionProperty->getDocComment(), $var);
             $properties[$reflectionProperty->getName()] = empty($var) ? '' : $var[1];
         }
 

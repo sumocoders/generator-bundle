@@ -27,8 +27,8 @@ class DataTransferObjectGeneratorTest extends PHPUnit_Framework_TestCase
 
         $propertyId->expects($this->atLeastOnce())
             ->method('getDocComment')
-            ->will($this->returnValue("/**\n * @var int\n **/"));
-        $propertyId->expects($this->atLeastOnce())
+            ->will($this->returnValue("/**\n * @var int\n * @ORM\\GeneratedValue\n **/"));
+        $propertyId->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('id'));
 
@@ -57,6 +57,6 @@ class DataTransferObjectGeneratorTest extends PHPUnit_Framework_TestCase
         $dataTransferObjectClass = $generator->generate($bundle, $entityReflection);
 
         $this->assertNotNull($dataTransferObjectClass);
-        $this->assertCount(2, $dataTransferObjectClass->getProperties());
+        $this->assertCount(1, $dataTransferObjectClass->getProperties());
     }
 }
