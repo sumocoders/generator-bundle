@@ -56,7 +56,7 @@ final class FileWriter
         $filePath = $path . DIRECTORY_SEPARATOR . $filename;
 
         if (!is_dir($path)) {
-            mkdir(dirname($path), 0775, true);
+            mkdir(dirname($filePath), 0775, true);
         }
 
         return file_put_contents($filePath, $content);
