@@ -11,7 +11,9 @@
     ],
     "prefer-stable": true,
     "require": {
-        "php": "^5.5 || ^7.0"
+        "php": "^5.5 || ^7.0",
+
+        "jms/cg": "^1.2"
     },
     "autoload": {
         "psr-0": { "SumoCoders\\GeneratorBundle": "" }
