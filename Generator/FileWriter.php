@@ -5,7 +5,7 @@ namespace SumoCoders\GeneratorBundle\Generator;
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 use SumoCoders\GeneratorBundle\Exception\FileAlreadyExists;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use SumoCoders\GeneratorBundle\Shared\Module;
 
 final class FileWriter
 {
@@ -20,17 +20,17 @@ final class FileWriter
     }
 
     /**
-     * @param BundleInterface $bundle
+     * @param Module $module
      * @param PhpClass $class
-     * @param string $root
+     * @param $root
      *
      * @throws FileAlreadyExists
      *
-     * @return mixed
+     * @return bool|int
      */
-    public function savePhpFileContent(BundleInterface $bundle, PhpClass $class, $root)
+    public function savePhpFileContent(Module $module, PhpClass $class, $root)
     {
-        $filename = $this->createFileName($bundle, $class->getShortName(), $root);
+        $filename = $this->createFileName($module, $class->getShortName(), $root);
         $content = $this->strategy->generate($class);
 
         if (file_exists($filename)) {
@@ -63,18 +63,18 @@ final class FileWriter
     }
 
     /**
-     * @param BundleInterface $bundle
-     * @param string $class
-     * @param string $root
+     * @param Module $module
+     * @param $class
+     * @param $root
      *
      * @return string
      */
-    protected function createFileName(BundleInterface $bundle, $class, $root)
+    protected function createFileName(Module $module, $class, $root)
     {
         return implode(
             DIRECTORY_SEPARATOR,
             [
-                $bundle->getPath(),
+                $module->getPath(),
                 $root,
                 str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php',
             ]

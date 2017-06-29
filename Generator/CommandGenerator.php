@@ -5,7 +5,7 @@ namespace SumoCoders\GeneratorBundle\Generator;
 use CG\Generator\PhpClass;
 use CG\Generator\PhpProperty;
 use ReflectionClass;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use SumoCoders\GeneratorBundle\Shared\Module;
 
 class CommandGenerator extends Generator
 {
@@ -14,8 +14,8 @@ class CommandGenerator extends Generator
     const DELETE_COMMAND = 'Delete';
 
     /**
-     * @param string $type
-     * @param BundleInterface $bundle
+     * @param $type
+     * @param Module $module
      * @param ReflectionClass $entityReflection
      * @param PhpClass $dataTransferObject
      *
@@ -23,7 +23,7 @@ class CommandGenerator extends Generator
      */
     public function generate(
         $type,
-        BundleInterface $bundle,
+        Module $module,
         ReflectionClass $entityReflection,
         PhpClass $dataTransferObject
     ) {
@@ -32,7 +32,7 @@ class CommandGenerator extends Generator
         $class = new PhpClass();
         $class->setName(
             $this->createClassName(
-                $bundle,
+                $module,
                 $commandName,
                 'Command'
             )

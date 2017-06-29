@@ -9,7 +9,7 @@ use CG\Generator\PhpProperty;
 use CG\Generator\Writer;
 use Doctrine\ORM\EntityManager;
 use ReflectionClass;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use SumoCoders\GeneratorBundle\Shared\Module;
 
 final class HandlerGenerator extends Generator
 {
@@ -19,7 +19,7 @@ final class HandlerGenerator extends Generator
 
     /**
      * @param string $handlerType
-     * @param BundleInterface $bundle
+     * @param Module $module
      * @param ReflectionClass $entityReflection
      * @param PhpClass $command
      *
@@ -27,7 +27,7 @@ final class HandlerGenerator extends Generator
      */
     public function generate(
         $handlerType,
-        BundleInterface $bundle,
+        Module $module,
         ReflectionClass $entityReflection,
         PhpClass $command
     ) {
@@ -36,7 +36,7 @@ final class HandlerGenerator extends Generator
         $handlerClass = new PhpClass();
         $handlerClass->setName(
             $this->createClassName(
-                $bundle,
+                $module,
                 $handlerName,
                 'Command'
             )

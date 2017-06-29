@@ -2,19 +2,19 @@
 
 namespace SumoCoders\GeneratorBundle\Generator;
 
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use SumoCoders\GeneratorBundle\Shared\Module;
 
 class Generator
 {
     /**
-     * @param BundleInterface $bundle
-     * @param string $className
-     * @param string $root
+     * @param Module $module
+     * @param $className
+     * @param $root
      *
      * @return string
      */
-    protected function createClassName(BundleInterface $bundle, $className, $root)
+    protected function createClassName(Module $module, $className, $root)
     {
-        return $bundle->getNamespace() . '\\' . $root . '\\' . $className;
+        return $module->getNamespace() . '\\' . $root . '\\' . $className;
     }
 }

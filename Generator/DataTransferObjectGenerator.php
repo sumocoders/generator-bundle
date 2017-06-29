@@ -10,24 +10,24 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use ReflectionClass;
 use ReflectionProperty;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use SumoCoders\GeneratorBundle\Shared\Module;
 
 final class DataTransferObjectGenerator extends Generator
 {
     /**
-     * @param BundleInterface $bundle
-     * @param ReflectionClass $entityReflection
+     * @param Module $module
+     * @param $entityReflection
      *
      * @return PhpClass
      */
-    public function generate(BundleInterface $bundle, $entityReflection)
+    public function generate(Module $module, $entityReflection)
     {
         $properties = $this->getProperties($entityReflection);
 
         $class = new PhpClass();
         $class->setName(
             $this->createClassName(
-                $bundle,
+                $module,
                 $entityReflection->getShortName() . 'DataTransferObject',
                 'DataTransferObject'
             )
