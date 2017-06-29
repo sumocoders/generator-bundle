@@ -37,91 +37,104 @@ class GeneratorCommand extends ContainerAwareCommand
     {
         $this->setName('sumocoders:generate');
         $this->addOption(
-            'entity',
-            '-en',
+            'entityFQN',
+            '-fqn',
             InputOption::VALUE_REQUIRED,
-            'The entity (shortcut notation) we\'ll using to generate DTOs, commands and command handlers'
+            'The entity\'s FQN we\'ll be using to generate DTOs, commands and command handlers'
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        list($bundleName, $entity) = $this->parseShortcutNotation($input->getOption('entity'));
+        static::validateExecutionPath();
 
-        $bundle = $this->getContainer()->get('kernel')->getBundle($bundleName);
+        $entityFQN = $input->getOption('entityFQN');
 
-        $entityReflection = new ReflectionClass($bundle->getNamespace() . '\\' . $entity);
+        $application = static::inferWhichApplicationIsRunnig($entityFQN);
+
+        $module = Module::fromApplicationAndEntity($application, $entityFQN);
+
+        $entityReflection = new ReflectionClass($entityFQN);
 
         $dataTransferObjectGenerator = new DataTransferObjectGenerator();
-        $dataTransferObject = $dataTransferObjectGenerator->generate($bundle, $entityReflection);
+        $dataTransferObject = $dataTransferObjectGenerator->generate($module, $entityReflection);
 
-        $this->fileWriter->savePhpFileContent($bundle, $dataTransferObject, 'DataTransferObject');
+        $this->fileWriter->savePhpFileContent($module, $dataTransferObject, 'DataTransferObject');
 
         $commandGenerator = new CommandGenerator();
 
         $createCommand = $commandGenerator->generate(
-            CommandGenerator::CREATE_COMMAND, $bundle, $entityReflection, $dataTransferObject
+            CommandGenerator::CREATE_COMMAND,
+            $module,
+            $entityReflection,
+            $dataTransferObject
         );
 
-        $this->fileWriter->savePhpFileContent($bundle, $createCommand, 'Command');
+        $this->fileWriter->savePhpFileContent($module, $createCommand, 'Command');
 
         $updateCommand = $commandGenerator->generate(
-            CommandGenerator::UPDATE_COMMAND, $bundle, $entityReflection, $dataTransferObject
+            CommandGenerator::UPDATE_COMMAND,
+            $module,
+            $entityReflection,
+            $dataTransferObject
         );
 
-        $this->fileWriter->savePhpFileContent($bundle, $updateCommand, 'Command');
+        $this->fileWriter->savePhpFileContent($module, $updateCommand, 'Command');
 
         $deleteCommand = $commandGenerator->generate(
-            CommandGenerator::DELETE_COMMAND, $bundle, $entityReflection, $dataTransferObject
+            CommandGenerator::DELETE_COMMAND,
+            $module,
+            $entityReflection,
+            $dataTransferObject
         );
 
-        $this->fileWriter->savePhpFileContent($bundle, $deleteCommand, 'Command');
+        $this->fileWriter->savePhpFileContent($module, $deleteCommand, 'Command');
 
         $handlerGenerator = new HandlerGenerator();
 
         $createCommandHandler = $handlerGenerator->generate(
             HandlerGenerator::CREATE_COMMAND,
-            $bundle,
+            $module,
             $entityReflection,
             $createCommand
         );
 
-        $this->fileWriter->savePhpFileContent($bundle, $createCommandHandler, 'Command');
+        $this->fileWriter->savePhpFileContent($module, $createCommandHandler, 'Command');
 
         $updateCommandHandler = $handlerGenerator->generate(
             HandlerGenerator::UPDATE_COMMAND,
-            $bundle,
+            $module,
             $entityReflection,
-            $createCommand
+            $updateCommand
         );
 
-        $this->fileWriter->savePhpFileContent($bundle, $updateCommandHandler, 'Command');
+        $this->fileWriter->savePhpFileContent($module, $updateCommandHandler, 'Command');
 
         $deleteCommandHandler = $handlerGenerator->generate(
             HandlerGenerator::DELETE_COMMAND,
-            $bundle,
+            $module,
             $entityReflection,
-            $createCommand
+            $deleteCommand
         );
 
-        $this->fileWriter->savePhpFileContent($bundle, $deleteCommandHandler, 'Command');
+        $this->fileWriter->savePhpFileContent($module, $deleteCommandHandler, 'Command');
 
         $configGenerator = new ConfigGenerator();
 
         $yaml = $configGenerator->generate(
-            $bundle->getName(),
-            $bundle->getPath(),
+            $module->getName(),
+            $module->getPath(),
             [$createCommandHandler, $updateCommandHandler, $deleteCommandHandler]
         );
 
         $this->fileWriter->saveYamlFileContent(
-            $bundle->getPath() . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR . 'config',
+            $module->getPath() . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR . 'config',
             'command.yml',
             $yaml
         );
 
         $output->writeln(
-            '<info>A new file services file was generated (' . $bundle->getName() .
+            '<info>A new file services file was generated (' . $module->getName() .
             "/Resources/config/command.yml).\n This file should be imported in the bundle's services.yml file.</info>"
         );
     }
