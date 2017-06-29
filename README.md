@@ -9,12 +9,23 @@ This bundle is under the MIT license. See the complete license at: [LICENSE](LIC
 
 # About
 
-...
+GeneratorBundle is a bundle created by [SumoCoders](https://sumocoders.be) and is intended to be used with the Framework
+or with ForkCMS. 
 
 # Usage 
 
-`app/console sumocoders:generate --entity AppBundle:Entity/Post`
+## Symfony
 
-# Issues
+`app/console sumocoders:generate --entityFQN 'AppBundle\Entity\Post`
 
-...
+## ForkCMS
+
+`app/console sumocoders:generate --entityFQN 'Backend\Modules\MyModule\Entity\Post`
+
+# Known Issues
+
+- Class names when not generated with FQN are prefixed with a backslash.
+
+# Other issues?
+
+Feel free to add an Issue on Github, or even better create a Pull Request.
