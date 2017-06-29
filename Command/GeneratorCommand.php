@@ -50,7 +50,7 @@ class GeneratorCommand extends ContainerAwareCommand
 
         $entityFQN = $input->getOption('entityFQN');
 
-        $application = static::inferWhichApplicationIsRunnig($entityFQN);
+        $application = static::inferWhichApplicationIsRunning($entityFQN);
 
         $module = Module::fromApplicationAndEntity($application, $entityFQN);
 
@@ -180,7 +180,7 @@ EOF
      *
      * @return Application
      */
-    private static function inferWhichApplicationIsRunnig($fqn)
+    private static function inferWhichApplicationIsRunning($fqn)
     {
         $path = str_replace('\\', DIRECTORY_SEPARATOR, $fqn);
 
