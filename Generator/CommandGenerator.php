@@ -21,8 +21,12 @@ class CommandGenerator extends Generator
      *
      * @return PhpClass
      */
-    public function generate($type, BundleInterface $bundle, ReflectionClass $entityReflection, $dataTransferObject)
-    {
+    public function generate(
+        $type,
+        BundleInterface $bundle,
+        ReflectionClass $entityReflection,
+        PhpClass $dataTransferObject
+    ) {
         $commandName = $type . $entityReflection->getShortName();
 
         $class = new PhpClass();
