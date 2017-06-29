@@ -9,5 +9,15 @@
             "email": "bruno@sumocoders.be"
         }
     ],
-    "target-dir": "SumoCoders/GeneratorBundle"
+    "prefer-stable": true,
+    "require": {
+        "php": "^5.5 || ^7.0"
+    },
+    "autoload": {
+        "psr-0": { "SumoCoders\\GeneratorBundle": "" }
+    },
+    "target-dir": "SumoCoders/GeneratorBundle",
+    "config": {
+        "bin-dir": "bin"
+    }
 }
