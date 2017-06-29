@@ -2,6 +2,7 @@
 
 namespace SumoCoders\GeneratorBundle\Command;
 
+use Exception;
 use InvalidArgumentException;
 use ReflectionClass;
 use SumoCoders\GeneratorBundle\Generator\CommandGenerator;
@@ -9,6 +10,8 @@ use SumoCoders\GeneratorBundle\Generator\ConfigGenerator;
 use SumoCoders\GeneratorBundle\Generator\DataTransferObjectGenerator;
 use SumoCoders\GeneratorBundle\Generator\FileWriter;
 use SumoCoders\GeneratorBundle\Generator\HandlerGenerator;
+use SumoCoders\GeneratorBundle\Shared\Module;
+use SumoCoders\GeneratorBundle\ValueObject\Application;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -142,5 +145,36 @@ class GeneratorCommand extends ContainerAwareCommand
         }
 
         return [substr($entity, 0, $pos), substr($entity, $pos + 1)];
+    }
+
+    /**
+     * @throws Exception
+     */
+    private static function validateExecutionPath()
+    {
+        $cwd = getcwd();
+        if (!is_dir($cwd . DIRECTORY_SEPARATOR . 'app') && !is_dir($cwd . DIRECTORY_SEPARATOR . 'src')) {
+            throw new Exception(
+                <<<EOF
+I cannot recognize this application or your are not running this command from the root of your application.
+EOF
+            );
+        }
+    }
+
+    /**
+     * @param string $fqn
+     *
+     * @return Application
+     */
+    private static function inferWhichApplicationIsRunnig($fqn)
+    {
+        $path = str_replace('\\', DIRECTORY_SEPARATOR, $fqn);
+
+        if (preg_match('/(Frontend)|(Backend)\/Modules/', $path)) {
+            return Application::fromString(Application::FORK);
+        }
+
+        return Application::fromString(Application::FRAMEWORK);
     }
 }
