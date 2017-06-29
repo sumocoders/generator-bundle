@@ -67,7 +67,7 @@ final class HandlerGenerator extends Generator
         $method = PhpMethod::create('handle');
 
         $writer = new Writer();
-        $writer->writeln('// TODO: Handle command');
+        $writer->writeln('// @TODO: Handle command');
         $method->setBody($writer->getContent());
 
         $parameter = new PhpParameter();
