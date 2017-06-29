@@ -55,4 +55,9 @@ final class Application
     {
         return new self($application);
     }
+
+    public function equals(Application $application)
+    {
+        return $this->application === $application->application;
+    }
 }

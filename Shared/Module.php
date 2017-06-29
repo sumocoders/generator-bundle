@@ -23,13 +23,26 @@ final class Module
     private $moduleFQN;
 
     /**
-     * @param Application $application
-     * @param string $modulePath
+     * @var string
      */
-    public function __construct(Application $application, $modulePath)
+    private $name;
+
+    /**
+     * @param Application $application
+     * @param string $moduleFQN
+     */
+    private function __construct(Application $application, $moduleFQN)
     {
         $this->application = $application;
-        $this->moduleFQN = $modulePath;
+        $this->moduleFQN = $moduleFQN;
+
+        $matches = [];
+        if ($this->application->equals(Application::fromString(Application::FORK))) {
+            preg_match("/(?:Backend|Frontend)\\\\Modules\\\\(\w+)/", $this->moduleFQN, $matches);
+        } else {
+            preg_match("/\w+Bundle\\\\(\w+)\\.*/", $this->moduleFQN, $matches);
+        }
+        $this->name = $matches[1];
     }
 
     /**
@@ -42,14 +55,12 @@ final class Module
      */
     public static function fromApplicationAndEntity(Application $application, $entityFQN)
     {
-        $path = str_replace('\\', DIRECTORY_SEPARATOR, $entityFQN);
-
         $matches = [];
 
-        if ($application === Application::fromString(Application::FORK)) {
-            preg_match('/((?:Backend|Frontend)\/Modules\/\w+)/.*/', $path, $matches);
+        if ($application->equals(Application::fromString(Application::FORK))) {
+            preg_match("/((?:Backend|Frontend)\\\\Modules\\\\\w+)\\\\.*/", $entityFQN, $matches);
         } else {
-            preg_match("/(\w+Bundle)\/.*/", $path, $matches);
+            preg_match("/(\w+Bundle)\\.*/", $entityFQN, $matches);
         }
 
         if (count($matches) !== 2) {
@@ -64,7 +75,7 @@ final class Module
      */
     public function getName()
     {
-        return $this->moduleFQN;
+        return $this->name;
     }
 
     /**
@@ -72,7 +83,12 @@ final class Module
      */
     public function getPath()
     {
-        return getcwd() . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . $this->moduleFQN;
+        return getcwd() . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR .
+            str_replace(
+                '\\',
+                DIRECTORY_SEPARATOR,
+                $this->moduleFQN
+            );
     }
 
     /**
