@@ -38,6 +38,24 @@ final class FileWriter
     }
 
     /**
+     * @param $path
+     * @param string $filename
+     * @param string $content
+     *
+     * @return bool|int
+     */
+    public function saveYamlFileContent($path, $filename, $content)
+    {
+        $filePath = $path . DIRECTORY_SEPARATOR . $filename;
+
+        if (!is_dir($path)) {
+            mkdir(dirname($path), 0775, true);
+        }
+
+        return file_put_contents($filePath, $content);
+    }
+
+    /**
      * @param BundleInterface $bundle
      * @param string $class
      * @param string $root
