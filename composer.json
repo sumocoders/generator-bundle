@@ -8,5 +8,6 @@
             "name": "Bruno Vitorino",
             "email": "bruno@sumocoders.be"
         }
-    ]
+    ],
+    "target-dir": "SumoCoders/GeneratorBundle"
 }
