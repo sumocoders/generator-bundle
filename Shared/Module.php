@@ -39,10 +39,10 @@ final class Module
         $matches = [];
         if ($this->application->equals(Application::fromString(Application::FORK))) {
             preg_match("/(?:Backend|Frontend)\\\\Modules\\\\(\w+)/", $this->moduleFQN, $matches);
+            $this->name = $matches[1];
         } else {
-            preg_match("/\w+Bundle\\\\(\w+)\\.*/", $this->moduleFQN, $matches);
+            $this->name = $moduleFQN;
         }
-        $this->name = $matches[1];
     }
 
     /**
