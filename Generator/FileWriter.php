@@ -4,6 +4,7 @@ namespace SumoCoders\GeneratorBundle\Generator;
 
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
+use SumoCoders\GeneratorBundle\Exception\FileAlreadyExists;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 final class FileWriter
@@ -23,12 +24,18 @@ final class FileWriter
      * @param PhpClass $class
      * @param string $root
      *
+     * @throws FileAlreadyExists
+     *
      * @return mixed
      */
-    public function saveFileContent(BundleInterface $bundle, PhpClass $class, $root)
+    public function savePhpFileContent(BundleInterface $bundle, PhpClass $class, $root)
     {
         $filename = $this->createFileName($bundle, $class->getShortName(), $root);
         $content = $this->strategy->generate($class);
+
+        if (file_exists($filename)) {
+            throw new FileAlreadyExists();
+        }
 
         if (!is_dir(dirname($filename))) {
             @mkdir(dirname($filename), 0775, true);
