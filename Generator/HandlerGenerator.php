@@ -92,6 +92,8 @@ final class HandlerGenerator extends Generator
         $entityManagerParameter->setType('EntityManager');
         $entityManagerParameter->setName('entityManager');
 
+        $writer->writeln('$this->entityManager = $entityManager;');
+
         $method->addParameter($entityManagerParameter);
 
         $method->setBody($writer->getContent());
